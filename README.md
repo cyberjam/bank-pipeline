@@ -19,3 +19,7 @@ conda install -c anaconda requests -y
 ```
 conda install -c anaconda beautifulsoup4 -y
 ```
+
+```
+conda install -c anaconda typing -y
+```
