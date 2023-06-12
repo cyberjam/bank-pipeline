@@ -3,6 +3,7 @@ import requests
 
 REGION: Final = ('서울', '인천', '경기', '강원', '충남', '충북', '대전', '경북',
                  '경남', '대구', '부산', '울산', '전북', '전남', '광주', '제주', '세종')
+URL: Final = 'https://www.kfcc.co.kr/map/list.do'
 
 headers: Dict = {
     'user-agent':
@@ -13,8 +14,8 @@ headers: Dict = {
 def main():
     """main 실행함수"""
     for region_name in REGION:
-        url = f'https://www.kfcc.co.kr/map/list.do?r1={region_name}&r2='
-        request_object = requests.get(url, headers=headers)
+        params = {'r1': region_name, 'r2': ''}
+        request_object = requests.get(URL, params=params, headers=headers)
         print(request_object.text)
 
 
