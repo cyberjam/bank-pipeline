@@ -1,4 +1,5 @@
 from typing import Final, Dict
+import json
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -43,7 +44,8 @@ def get_bank_info():
 
 def main():
     """main 실행함수"""
-    print(get_bank_info())
+    with open('bank_code_info.json', 'w', encoding='UTF-8') as file:
+        json.dump(get_bank_info(), file, indent=4)
 
 
 if __name__ == '__main__':
