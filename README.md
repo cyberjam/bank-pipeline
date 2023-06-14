@@ -23,3 +23,7 @@ conda install -c anaconda beautifulsoup4 -y
 ```
 conda install -c anaconda typing -y
 ```
+
+```
+conda install -c conda-forge tqdm -y
+```
