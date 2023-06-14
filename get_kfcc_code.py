@@ -1,6 +1,7 @@
 from typing import Final, Dict
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 REGION: Final = ('서울', '인천', '경기', '강원', '충남', '충북', '대전', '경북',
                  '경남', '대구', '부산', '울산', '전북', '전남', '광주', '제주', '세종')
@@ -26,10 +27,23 @@ def get_page_source(region_name):
     return request_object.text
 
 
+def get_bank_info():
+    """모든 지역 지점 정보를 반환합니다.
+
+    Returns:
+        list of dictionary: 전국 각 지점 정보를 dictionary로 list에 담아 반환
+    """
+    return [
+        {data['title']: data.get_text() for data in cell.select("span")}
+        for region_name in tqdm(REGION)
+        for row in BeautifulSoup(get_page_source(region_name), 'html.parser').select("tr")
+        for cell in row.select("td.no")
+    ]
+
+
 def main():
     """main 실행함수"""
-    for region_name in REGION:
-        get_page_source(region_name)
+    print(get_bank_info())
 
 
 if __name__ == '__main__':
