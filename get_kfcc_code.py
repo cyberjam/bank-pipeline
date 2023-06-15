@@ -28,24 +28,83 @@ def get_page_source(region_name):
     return request_object.text
 
 
-def get_bank_info():
-    """모든 지역 지점 정보를 반환합니다.
+def get_soup(html):
+    """html을 beautifulsoup로 parsing하여 객체로 반환합니다.
+
+    Args:
+        html (string): 전국 지점 목록 페이지를 request하여 받은 page source code
 
     Returns:
-        list of dictionary: 전국 각 지점 정보를 dictionary로 list에 담아 반환
+        bs4.BeautifulSoup: html을 beutifulsoup으로 parsing 한 soup 객체
     """
-    return [
-        {data['title']: data.get_text() for data in cell.select("span")}
-        for region_name in tqdm(REGION)
-        for row in BeautifulSoup(get_page_source(region_name), 'html.parser').select("tr")
-        for cell in row.select("td.no")
-    ]
+    return BeautifulSoup(html, 'html.parser')
+
+
+def get_rows(soup):
+    """table의 row들을 반환합니다.
+
+    Args:
+        soup (bs4.BeautifulSoup): html을 beutifulsoup으로 parsing 한 soup 객체
+    Returns:
+        bs4.element.ResultSet: table의 해당 row들
+    """
+    return soup.select("tr")
+
+
+def get_cells(row):
+    """각 지점 cells들을 반환합니다.
+
+    Args:
+        row (bs4.element.ResultSet): table의 해당 row
+
+    Returns:
+        bs4.element.ResultSet: table의 해당 row에 속한 cell들
+    """
+    return row.select("td.no")
+
+
+def get_datas(cell):
+    """지점 정보를 넘겨줍니다.
+
+    Args:
+        cell (bs4.element.ResultSet): table의 해당 row에서 각 cell
+
+    Yields:
+        tuple: dictionary의 key와 value
+    """
+    for data in cell.select("span"):
+        yield data['title'], data.get_text()
+
+
+def get_bank_info():
+    """모든 지역 지점 정보를 넘겨줍니다.
+
+    Yields:
+        dictionary: 각 지점 정보
+    """
+    for region_name in tqdm(REGION):
+        html = get_page_source(region_name)
+        soup = get_soup(html)
+        for row in get_rows(soup):
+            for cell in get_cells(row):
+                yield dict(get_datas(cell))
+
+
+def save_json(file_path, data):
+    """ 결과물을 json으로 저장
+
+    Args:
+        file_path (string): 저장할 위치와 저장 파일 이름
+        data (generator): 결과물
+    """
+    with open(file_path, 'w', encoding='UTF-8') as file:
+        json.dump(list(data), file, indent=4)
 
 
 def main():
     """main 실행함수"""
-    with open('bank_code_info.json', 'w', encoding='UTF-8') as file:
-        json.dump(get_bank_info(), file, indent=4)
+    bank_info = get_bank_info()
+    save_json('bank_code_info.json', bank_info)
 
 
 if __name__ == '__main__':
