@@ -1,5 +1,8 @@
 import requests
 from typing import Final, Dict
+from bs4 import BeautifulSoup
+import json
+import re
 
 URL: Final = 'https://kfcc.co.kr/gumgo/gum0301_view_new.do'
 
@@ -40,5 +43,49 @@ payload: Dict = {
     'gonsiMonth': '12'
 }
 
-request_object = requests.post(URL, headers=headers, data=payload)
-print(request_object.text)
+
+def get_page_source():
+    request_object = requests.post(URL, headers=headers, data=payload)
+    return request_object.text
+
+
+def get_soup(html):
+    return BeautifulSoup(html, 'html.parser')
+
+
+def get_data(soup):
+    return soup.select_one('#contentsdata')['value']
+
+
+def preprocess_data(raw_data):
+    space = '                                                                                                '
+    type_last_index = 7
+    splited_data = re.sub(f'{space}+', '\n', raw_data).split('\n')
+    for line in splited_data:
+        type_number = line[:type_last_index+1]
+        content = line[type_last_index+1:]
+        if type_number != '0000':
+            yield {
+                'type': type_number,
+                'content': content
+            }
+
+
+def get_indicator(preprocessed_data):
+    for line in preprocessed_data:
+        if line['type'] == '25000001':
+            return line['content'].split('|')[2]
+
+
+def main():
+    html = get_page_source()
+    soup = get_soup(html)
+    raw_data = get_data(soup)
+    # with open('test.txt', 'w', encoding='UTF-8') as file:
+    #     json.dump(data, file, indent=4)
+    preprocessed_data = preprocess_data(raw_data)
+    print(get_indicator(preprocessed_data))
+
+
+if __name__ == '__main__':
+    main()
