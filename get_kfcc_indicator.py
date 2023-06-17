@@ -45,8 +45,15 @@ payload: Dict = {
 
 
 def get_bank_code():
+    def preprecess_bank_infos(bank_infos):
+        for bank_info in bank_infos:
+            bank_code = bank_info['gmgoCd']
+            bank_name = bank_info['name']
+            yield bank_code, bank_name
+
     with open('bank_code_info.json', encoding='UTF-8') as file:
-        return json.load(file)
+        bank_infos = json.load(file)
+    return dict(preprecess_bank_infos(bank_infos))
 
 
 def get_page_source():
@@ -82,6 +89,7 @@ def get_indicator(preprocessed_data):
 
 
 def main():
+    print(get_bank_code())
     html = get_page_source()
     soup = get_soup(html)
     raw_data = get_data(soup)
