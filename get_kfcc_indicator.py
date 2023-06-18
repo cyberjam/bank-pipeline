@@ -34,14 +34,26 @@ payload: Dict = {
     'procGbcd': '1',
     'pageNo': '',
     'gongsiGmgoid': '',
-    'gmgocd': '0313',
+    'gmgocd': '0101',
     'hpageBrwsUm': '1',
     'gongsiDate': '',
     'strd_yymm': '202212',
-    'gmgoNm': '이태원1동',
+    'gmgoNm': '',
     'gonsiYear': '2022',
     'gonsiMonth': '12'
 }
+
+
+def get_bank_code():
+    def preprecess_bank_infos(bank_infos):
+        for bank_info in bank_infos:
+            bank_code = bank_info['gmgoCd']
+            bank_name = bank_info['name']
+            yield bank_code, bank_name
+
+    with open('bank_code_info.json', encoding='UTF-8') as file:
+        bank_infos = json.load(file)
+    return dict(preprecess_bank_infos(bank_infos))
 
 
 def get_page_source():
@@ -58,31 +70,29 @@ def get_data(soup):
 
 
 def preprocess_data(raw_data):
-    space = '                                                                                                '
+    space = ' '*100
     type_last_index = 7
     splited_data = re.sub(f'{space}+', '\n', raw_data).split('\n')
     for line in splited_data:
         type_number = line[:type_last_index+1]
         content = line[type_last_index+1:]
-        if type_number != '0000':
-            yield {
-                'type': type_number,
-                'content': content
-            }
+
+        if type_number == '0000':
+            break
+
+        yield type_number, content
 
 
 def get_indicator(preprocessed_data):
-    for line in preprocessed_data:
-        if line['type'] == '25000001':
-            return line['content'].split('|')[2]
+    data = dict(preprocessed_data)
+    return data['25000001'].split('|')[2]
 
 
 def main():
+    print(get_bank_code())
     html = get_page_source()
     soup = get_soup(html)
     raw_data = get_data(soup)
-    # with open('test.txt', 'w', encoding='UTF-8') as file:
-    #     json.dump(data, file, indent=4)
     preprocessed_data = preprocess_data(raw_data)
     print(get_indicator(preprocessed_data))
 
