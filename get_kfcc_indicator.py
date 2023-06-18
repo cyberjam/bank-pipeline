@@ -80,7 +80,7 @@ def process_raw_data(raw_data):
 
 def get_indicator(processed_raw_data):
     def extract_indicator(processed_raw_data, address):
-        return processed_raw_data[address].split('|')[2]
+        return processed_raw_data.get(address, '').split('|')[2]
 
     return {
         "위험가중자산대비 자기자본비율": extract_indicator(processed_raw_data, '25000001'),
