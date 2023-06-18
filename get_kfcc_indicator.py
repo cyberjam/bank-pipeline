@@ -45,15 +45,9 @@ payload: Dict = {
 
 
 def get_bank_code_info():
-    def preprocess_bank_infos(bank_infos):
-        for bank_info in bank_infos:
-            bank_code = bank_info['gmgoCd']
-            bank_name = bank_info['name']
-            yield bank_code, bank_name
-
     with open('bank_code_info.json', encoding='UTF-8') as file:
         bank_infos = json.load(file)
-    return dict(preprocess_bank_infos(bank_infos))
+        return {bank_info['gmgoCd']: bank_info['name'] for bank_info in bank_infos}
 
 
 def get_page_source():
@@ -70,25 +64,18 @@ def get_raw_data(soup):
 
 
 def process_raw_data(raw_data):
-    def get_lines(raw_data):
-        space = " "*100
-        lines = re.split(f'{space}+', raw_data)
-        return lines
+    lines = re.split(r'\s{100,}', raw_data)
+    processed_data = {}
 
-    def get_address_content(lines):
-        def separate_line(line):
-            address_last_index = 7
-            return line[:address_last_index+1], line[address_last_index+1:]
+    for line in lines:
+        if address == '0000':
+            break
+        address = line[:8].strip()
+        content = line[8:].strip()
 
-        for line in lines:
-            address, content = separate_line(line)
-            eof = address == '0000'
-            if eof:
-                break
-            yield address, content
+        processed_data[address] = content
 
-    lines = get_lines(raw_data)
-    return dict(get_address_content(lines))
+    return processed_data
 
 
 def get_indicator(processed_raw_data):
