@@ -68,10 +68,11 @@ def process_raw_data(raw_data):
     processed_data = {}
 
     for line in lines:
-        if address == '0000':
-            break
         address = line[:8].strip()
         content = line[8:].strip()
+
+        if address == '0000':
+            break
 
         processed_data[address] = content
 
