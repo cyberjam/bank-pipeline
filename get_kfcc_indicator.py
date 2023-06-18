@@ -1,5 +1,5 @@
-import requests
 from typing import Final, Dict
+import requests
 from bs4 import BeautifulSoup
 import json
 import re
@@ -44,8 +44,8 @@ payload: Dict = {
 }
 
 
-def get_bank_code():
-    def preprecess_bank_infos(bank_infos):
+def get_bank_code_info():
+    def preprocess_bank_infos(bank_infos):
         for bank_info in bank_infos:
             bank_code = bank_info['gmgoCd']
             bank_name = bank_info['name']
@@ -53,7 +53,7 @@ def get_bank_code():
 
     with open('bank_code_info.json', encoding='UTF-8') as file:
         bank_infos = json.load(file)
-    return dict(preprecess_bank_infos(bank_infos))
+    return dict(preprocess_bank_infos(bank_infos))
 
 
 def get_page_source():
@@ -65,36 +65,54 @@ def get_soup(html):
     return BeautifulSoup(html, 'html.parser')
 
 
-def get_data(soup):
+def get_raw_data(soup):
     return soup.select_one('#contentsdata')['value']
 
 
-def preprocess_data(raw_data):
-    space = ' '*100
-    type_last_index = 7
-    splited_data = re.sub(f'{space}+', '\n', raw_data).split('\n')
-    for line in splited_data:
-        type_number = line[:type_last_index+1]
-        content = line[type_last_index+1:]
+def process_raw_data(raw_data):
+    def get_lines(raw_data):
+        space = " "*100
+        lines = re.split(f'{space}+', raw_data)
+        return lines
 
-        if type_number == '0000':
-            break
+    def get_address_content(lines):
+        def separate_line(line):
+            address_last_index = 7
+            return line[:address_last_index+1], line[address_last_index+1:]
 
-        yield type_number, content
+        for line in lines:
+            address, content = separate_line(line)
+            eof = address == '0000'
+            if eof:
+                break
+            yield address, content
+
+    lines = get_lines(raw_data)
+    return dict(get_address_content(lines))
 
 
-def get_indicator(preprocessed_data):
-    data = dict(preprocessed_data)
-    return data['25000001'].split('|')[2]
+def get_indicator(processed_raw_data):
+    def extract_indicator(processed_raw_data, address):
+        return processed_raw_data[address].split('|')[2]
+
+    return {
+        "위험가중자산대비 자기자본비율": extract_indicator(processed_raw_data, '25000001'),
+        "순고정이하 여신비율": extract_indicator(processed_raw_data, '25000005'),
+        "유동성 비율": extract_indicator(processed_raw_data, '25000007'),
+        "총자산 순이익률": extract_indicator(processed_raw_data, '25000009'),
+        "경영실태 평가": extract_indicator(processed_raw_data, '31000001'),
+    }
 
 
 def main():
-    print(get_bank_code())
+    # print(get_bank_code_info())
     html = get_page_source()
     soup = get_soup(html)
-    raw_data = get_data(soup)
-    preprocessed_data = preprocess_data(raw_data)
-    print(get_indicator(preprocessed_data))
+    raw_data = get_raw_data(soup)
+    with open('t.txt', 'w', encoding='UTF-8') as file:
+        json.dump(raw_data, file, ensure_ascii=False, indent=4)
+    processed_raw_data = process_raw_data(raw_data)
+    print(get_indicator(processed_raw_data))
 
 
 if __name__ == '__main__':
