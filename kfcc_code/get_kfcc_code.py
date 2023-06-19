@@ -98,13 +98,13 @@ def save_json(file_path, data):
         data (generator): 결과물
     """
     with open(file_path, 'w', encoding='UTF-8') as file:
-        json.dump(list(data), file, indent=4)
+        json.dump(list(data), file, ensure_ascii=False, indent=4)
 
 
 def main():
     """main 실행함수"""
     bank_info = get_bank_info()
-    save_json('bank_code_info.json', bank_info)
+    save_json('../data/bank_code_info.json', bank_info)
 
 
 if __name__ == '__main__':
