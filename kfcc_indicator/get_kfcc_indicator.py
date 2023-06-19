@@ -2,6 +2,7 @@ import json
 import re
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 from constants import INDICATOR_URL, INDICATOR_HEADERS, INDICATOR_PAYLOAD
 
 
@@ -11,8 +12,8 @@ def get_bank_code_info():
         return {bank_info['gmgoCd']: bank_info['name'] for bank_info in bank_infos}
 
 
-def get_page_source():
-    INDICATOR_PAYLOAD['gmgocd'] = '0101'
+def get_page_source(bank_code):
+    INDICATOR_PAYLOAD['gmgocd'] = bank_code
     request_object = requests.post(
         INDICATOR_URL, headers=INDICATOR_HEADERS, data=INDICATOR_PAYLOAD)
     return request_object.text
@@ -23,7 +24,10 @@ def get_soup(html):
 
 
 def get_raw_data(soup):
-    return soup.select_one('#contentsdata')['value']
+    contentsdata = soup.select_one('#contentsdata')
+    if contentsdata is None:
+        return ''
+    return contentsdata['value']
 
 
 def process_raw_data(raw_data):
@@ -37,16 +41,19 @@ def process_raw_data(raw_data):
         if address == '0000':
             break
 
-        processed_data[address] = content
+        processed_data[address] = content.split('|')
 
     return processed_data
 
 
-def get_indicator(processed_raw_data):
-    def extract_indicator(processed_raw_data, address):
-        return processed_raw_data.get(address, '').split('|')[2]
+def extract_indicator(processed_raw_data, address):
+    return processed_raw_data.get(address, f'{" "*3}')[2]
 
+
+def integrate_indicator(processed_raw_data, bank_code, bank_name):
     return {
+        "지점명": bank_name,
+        "지점코드": bank_code,
         "위험가중자산대비 자기자본비율": extract_indicator(processed_raw_data, '25000001'),
         "순고정이하 여신비율": extract_indicator(processed_raw_data, '25000005'),
         "유동성 비율": extract_indicator(processed_raw_data, '25000007'),
@@ -55,13 +62,29 @@ def get_indicator(processed_raw_data):
     }
 
 
+def get_indicator():
+    for bank_code, bank_name in tqdm(get_bank_code_info().items()):
+        html = get_page_source(bank_code)
+        soup = get_soup(html)
+        raw_data = get_raw_data(soup)
+        processed_raw_data = process_raw_data(raw_data)
+        yield integrate_indicator(processed_raw_data, bank_code, bank_name)
+
+
+def save_json(file_path, data):
+    """ 결과물을 json으로 저장
+
+    Args:
+        file_path (string): 저장할 위치와 저장 파일 이름
+        data (generator): 결과물
+    """
+    with open(file_path, 'w', encoding='UTF-8') as file:
+        json.dump(list(data), file, ensure_ascii=False, indent=4)
+
+
 def main():
-    # print(get_bank_code_info())
-    html = get_page_source()
-    soup = get_soup(html)
-    raw_data = get_raw_data(soup)
-    processed_raw_data = process_raw_data(raw_data)
-    print(get_indicator(processed_raw_data))
+    bank_indicator = list(get_indicator())
+    save_json('../data/bank_indicator.json', bank_indicator)
 
 
 if __name__ == '__main__':
