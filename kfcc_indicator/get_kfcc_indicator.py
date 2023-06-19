@@ -14,9 +14,9 @@ def get_bank_code_info():
 
 def get_page_source(bank_code):
     INDICATOR_PAYLOAD['gmgocd'] = bank_code
-    request_object = requests.post(
+    response = requests.post(
         INDICATOR_URL, headers=INDICATOR_HEADERS, data=INDICATOR_PAYLOAD)
-    return request_object.text
+    return response.text
 
 
 def get_soup(html):

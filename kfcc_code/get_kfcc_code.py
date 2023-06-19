@@ -24,8 +24,8 @@ def get_page_source(region_name):
         string: 해당 지역 지점 목록 html이 text로 반환
     """
     params = {'r1': region_name, 'r2': ''}
-    request_object = requests.get(URL, params=params, headers=headers)
-    return request_object.text
+    response = requests.get(URL, params=params, headers=headers)
+    return response.text
 
 
 def get_soup(html):
