@@ -1,47 +1,8 @@
-from typing import Final, Dict
-import requests
-from bs4 import BeautifulSoup
 import json
 import re
-
-URL: Final = 'https://kfcc.co.kr/gumgo/gum0301_view_new.do'
-
-headers: Dict = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6,zh;q=0.5',
-    'Cache-Control': 'max-age=0',
-    'Connection': 'keep-alive',
-    'Content-Length': '161',
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'Cookie': '',
-    'DNT': '1',
-    'Host': 'kfcc.co.kr',
-    'Origin': 'https://kfcc.co.kr',
-    'Referer': 'https://kfcc.co.kr/gumgo/regulardisclosure.do',
-    'Sec-Fetch-Dest': 'document',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'same-origin',
-    'Sec-Fetch-User': '?1',
-    'Upgrade-Insecure-Requests': '1',
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-    'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"macOS"'
-}
-
-payload: Dict = {
-    'procGbcd': '1',
-    'pageNo': '',
-    'gongsiGmgoid': '',
-    'gmgocd': '0101',
-    'hpageBrwsUm': '1',
-    'gongsiDate': '',
-    'strd_yymm': '202212',
-    'gmgoNm': '',
-    'gonsiYear': '2022',
-    'gonsiMonth': '12'
-}
+import requests
+from bs4 import BeautifulSoup
+from constants import INDICATOR_URL, INDICATOR_HEADERS, INDICATOR_PAYLOAD
 
 
 def get_bank_code_info():
@@ -51,7 +12,9 @@ def get_bank_code_info():
 
 
 def get_page_source():
-    request_object = requests.post(URL, headers=headers, data=payload)
+    INDICATOR_PAYLOAD['gmgocd'] = '0101'
+    request_object = requests.post(
+        INDICATOR_URL, headers=INDICATOR_HEADERS, data=INDICATOR_PAYLOAD)
     return request_object.text
 
 
@@ -97,8 +60,6 @@ def main():
     html = get_page_source()
     soup = get_soup(html)
     raw_data = get_raw_data(soup)
-    with open('t.txt', 'w', encoding='UTF-8') as file:
-        json.dump(raw_data, file, ensure_ascii=False, indent=4)
     processed_raw_data = process_raw_data(raw_data)
     print(get_indicator(processed_raw_data))
 
