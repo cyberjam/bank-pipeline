@@ -6,7 +6,7 @@ from constants import INDICATOR_URL, INDICATOR_HEADERS, INDICATOR_PAYLOAD
 
 
 def get_bank_code_info():
-    with open('bank_code_info.json', encoding='UTF-8') as file:
+    with open('../data/bank_code_info.json', encoding='UTF-8') as file:
         bank_infos = json.load(file)
         return {bank_info['gmgoCd']: bank_info['name'] for bank_info in bank_infos}
 

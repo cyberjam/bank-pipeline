@@ -104,7 +104,7 @@ def save_json(file_path, data):
 def main():
     """main 실행함수"""
     bank_info = get_bank_info()
-    save_json('bank_code_info.json', bank_info)
+    save_json('../data/bank_code_info.json', bank_info)
 
 
 if __name__ == '__main__':
