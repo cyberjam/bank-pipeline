@@ -98,7 +98,7 @@ def save_json(file_path, data):
         data (generator): 결과물
     """
     with open(file_path, 'w', encoding='UTF-8') as file:
-        json.dump(list(data), file, indent=4)
+        json.dump(list(data), file, ensure_ascii=False, indent=4)
 
 
 def main():
