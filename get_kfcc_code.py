@@ -1,4 +1,3 @@
-from typing import Final, Dict
 import requests
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
