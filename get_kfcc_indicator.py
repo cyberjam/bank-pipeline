@@ -2,33 +2,33 @@ import json
 import re
 from tqdm import tqdm
 from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
-from utils.save_json import save_json
-from utils.create_soup import create_soup
 from utils.fetch_page_source import fetch_page_source
+from utils.create_soup import create_soup
+from utils.write_json import write_json
 
 
-def get_bank_code_info():
+def load_bank_code_info():
     with open(GLOBAL_CONSTANT['CODE_JSON_PATH'], encoding='UTF-8') as file:
         bank_infos = json.load(file)
         return {bank_info['gmgoCd']: bank_info['name'] for bank_info in bank_infos}
 
 
-def get_payload(bank_code):
+def build_payload(bank_code):
     payload = BANK_INDICATOR_CONSTANT['PAYLOAD']
     payload['gmgocd'] = bank_code
     return payload
 
 
-def get_raw_data(soup):
+def extract_raw_data(soup):
     contentsdata = soup.select_one('#contentsdata')
     if contentsdata is None:
         return ''
     return contentsdata['value']
 
 
-def process_raw_data(raw_data):
+def parse_raw_data(raw_data):
     lines = re.split(r'\s{100,}', raw_data)
-    processed_data = {}
+    parsed_data = {}
 
     for line in lines:
         address = line[:8].strip()
@@ -37,16 +37,16 @@ def process_raw_data(raw_data):
         if address == '0000':
             break
 
-        processed_data[address] = content.split('|')
+        parsed_data[address] = content.split('|')
 
-    return processed_data
+    return parsed_data
 
 
 def extract_indicator(processed_raw_data, address):
     return processed_raw_data.get(address, f'{" "*3}')[2]
 
 
-def integrate_indicator(processed_raw_data, bank_code, bank_name):
+def build_indicator_data(processed_raw_data, bank_code, bank_name):
     return {
         "지점명": bank_name,
         "지점코드": bank_code,
@@ -58,22 +58,22 @@ def integrate_indicator(processed_raw_data, bank_code, bank_name):
     }
 
 
-def get_indicator():
-    for bank_code, bank_name in tqdm(get_bank_code_info().items()):
-        payload = get_payload(bank_code)
+def fetch_bank_indicators():
+    for bank_code, bank_name in tqdm(load_bank_code_info().items()):
+        payload = build_payload(bank_code)
         html = fetch_page_source(method='POST',
                                  url=BANK_INDICATOR_CONSTANT['URL'],
                                  headers=BANK_INDICATOR_CONSTANT['HEADERS'],
                                  data=payload)
         soup = create_soup(html)
-        raw_data = get_raw_data(soup)
-        processed_raw_data = process_raw_data(raw_data)
-        yield integrate_indicator(processed_raw_data, bank_code, bank_name)
+        raw_data = extract_raw_data(soup)
+        parsed_raw_data = parse_raw_data(raw_data)
+        yield build_indicator_data(parsed_raw_data, bank_code, bank_name)
 
 
 def main():
-    bank_indicator = list(get_indicator())
-    save_json(GLOBAL_CONSTANT['INDICATOR_JSON_PATH'], bank_indicator)
+    bank_indicator = list(fetch_bank_indicators())
+    write_json(GLOBAL_CONSTANT['INDICATOR_JSON_PATH'], bank_indicator)
 
 
 if __name__ == '__main__':

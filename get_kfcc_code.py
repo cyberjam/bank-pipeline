@@ -1,15 +1,15 @@
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
-from utils.save_json import save_json
-from utils.create_soup import create_soup
 from utils.fetch_page_source import fetch_page_source
+from utils.create_soup import create_soup
+from utils.write_json import write_json
 
 
-def get_params(region_name):
+def build_params(region_name):
     return {'r1': region_name, 'r2': ''}
 
 
-def get_rows(soup):
+def extract_rows(soup):
     """table의 row들을 반환합니다.
 
     Args:
@@ -20,7 +20,7 @@ def get_rows(soup):
     return soup.select("tr")
 
 
-def get_cells(row):
+def extract_cells(row):
     """각 지점 cells들을 반환합니다.
 
     Args:
@@ -32,7 +32,7 @@ def get_cells(row):
     return row.select("td.no")
 
 
-def get_datas(cell):
+def extract_data(cell):
     """지점 정보를 넘겨줍니다.
 
     Args:
@@ -45,28 +45,28 @@ def get_datas(cell):
         yield data['title'], data.get_text()
 
 
-def get_bank_info():
+def fetch_bank_info():
     """모든 지역 지점 정보를 넘겨줍니다.
 
     Yields:
         dictionary: 각 지점 정보
     """
     for region_name in tqdm(BANK_CODE_CONSTANT['REGION']):
-        params = get_params(region_name)
+        params = build_params(region_name)
         html = fetch_page_source(method='GET',
                                  url=BANK_CODE_CONSTANT['URL'],
                                  headers=BANK_CODE_CONSTANT['HEADERS'],
                                  params=params)
         soup = create_soup(html)
-        for row in get_rows(soup):
-            for cell in get_cells(row):
-                yield dict(get_datas(cell))
+        for row in extract_rows(soup):
+            for cell in extract_cells(row):
+                yield dict(extract_data(cell))
 
 
 def main():
     """main 실행함수"""
-    bank_info = list(get_bank_info())
-    save_json(GLOBAL_CONSTANT['CODE_JSON_PATH'], bank_info)
+    bank_info = list(fetch_bank_info())
+    write_json(GLOBAL_CONSTANT['CODE_JSON_PATH'], bank_info)
 
 
 if __name__ == '__main__':

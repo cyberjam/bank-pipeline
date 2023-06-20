@@ -1,10 +1,7 @@
 import json
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 
-def save_json(file_path, data):
+def write_json(file_path, data):
     """ 결과물을 json으로 저장
 
     Args:
