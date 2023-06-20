@@ -1,5 +1,7 @@
 from typing import Final, Dict
 
+CODE_JSON_PATH: Final = 'data/bank_code_info.json'
+
 INDICATOR_URL: Final = 'https://kfcc.co.kr/gumgo/gum0301_view_new.do'
 
 INDICATOR_HEADERS: Final = {

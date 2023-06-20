@@ -1,8 +1,9 @@
 from typing import Final, Dict
-import json
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+from constants import CODE_JSON_PATH
+from utils.save_json import save_json
 
 REGION: Final = ('서울', '인천', '경기', '강원', '충남', '충북', '대전', '경북',
                  '경남', '대구', '부산', '울산', '전북', '전남', '광주', '제주', '세종')
@@ -90,21 +91,10 @@ def get_bank_info():
                 yield dict(get_datas(cell))
 
 
-def save_json(file_path, data):
-    """ 결과물을 json으로 저장
-
-    Args:
-        file_path (string): 저장할 위치와 저장 파일 이름
-        data (generator): 결과물
-    """
-    with open(file_path, 'w', encoding='UTF-8') as file:
-        json.dump(list(data), file, ensure_ascii=False, indent=4)
-
-
 def main():
     """main 실행함수"""
     bank_info = get_bank_info()
-    save_json('../data/bank_code_info.json', bank_info)
+    save_json(CODE_JSON_PATH, bank_info)
 
 
 if __name__ == '__main__':

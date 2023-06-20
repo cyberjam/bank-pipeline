@@ -3,11 +3,12 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-from constants import INDICATOR_URL, INDICATOR_HEADERS, INDICATOR_PAYLOAD
+from constants import INDICATOR_URL, INDICATOR_HEADERS, INDICATOR_PAYLOAD, CODE_JSON_PATH
+from utils.save_json import save_json
 
 
 def get_bank_code_info():
-    with open('../data/bank_code_info.json', encoding='UTF-8') as file:
+    with open(CODE_JSON_PATH, encoding='UTF-8') as file:
         bank_infos = json.load(file)
         return {bank_info['gmgoCd']: bank_info['name'] for bank_info in bank_infos}
 
@@ -71,20 +72,9 @@ def get_indicator():
         yield integrate_indicator(processed_raw_data, bank_code, bank_name)
 
 
-def save_json(file_path, data):
-    """ 결과물을 json으로 저장
-
-    Args:
-        file_path (string): 저장할 위치와 저장 파일 이름
-        data (generator): 결과물
-    """
-    with open(file_path, 'w', encoding='UTF-8') as file:
-        json.dump(list(data), file, ensure_ascii=False, indent=4)
-
-
 def main():
     bank_indicator = list(get_indicator())
-    save_json('../data/bank_indicator.json', bank_indicator)
+    save_json('data/bank_indicator.json', bank_indicator)
 
 
 if __name__ == '__main__':
