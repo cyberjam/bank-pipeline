@@ -1,5 +1,18 @@
 from typing import Final, Dict
 
+CODE_REGION: Final = ('서울', '인천', '경기', '강원', '충남', '충북', '대전', '경북',
+                      '경남', '대구', '부산', '울산', '전북', '전남', '광주', '제주', '세종')
+CODE_URL: Final = 'https://www.kfcc.co.kr/map/list.do'
+
+CODE_HEADERS: Dict = {
+    'user-agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+}
+CODE_PARAMS: Dict = {'r1': '', 'r2': ''}
+
+CODE_JSON_PATH: Final = 'data/bank_code_info.json'
+
+
 INDICATOR_URL: Final = 'https://kfcc.co.kr/gumgo/gum0301_view_new.do'
 
 INDICATOR_HEADERS: Final = {
@@ -37,4 +50,21 @@ INDICATOR_PAYLOAD: Dict = {
     'gmgoNm': '',
     'gonsiYear': '2022',
     'gonsiMonth': '12'
+}
+
+INDICATOR_JSON_PATH = 'data/bank_indicator.json'
+
+
+GLOBAL_CONSTANT = {"CODE_JSON_PATH": CODE_JSON_PATH,
+                   "INDICATOR_JSON_PATH": INDICATOR_JSON_PATH}
+
+BANK_CODE_CONSTANT = {"REGION": CODE_REGION,
+                      "URL": CODE_URL,
+                      "HEADERS": CODE_HEADERS,
+                      "PARAMS": CODE_PARAMS}
+
+BANK_INDICATOR_CONSTANT = {
+    "URL": INDICATOR_URL,
+    "HEADERS": INDICATOR_HEADERS,
+    "PAYLOAD": INDICATOR_PAYLOAD
 }
