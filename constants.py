@@ -8,6 +8,7 @@ CODE_HEADERS: Dict = {
     'user-agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 }
+CODE_PARAMS: Dict = {'r1': '', 'r2': ''}
 
 CODE_JSON_PATH: Final = 'data/bank_code_info.json'
 
@@ -59,7 +60,8 @@ GLOBAL_CONSTANT = {"CODE_JSON_PATH": CODE_JSON_PATH,
 
 BANK_CODE_CONSTANT = {"REGION": CODE_REGION,
                       "URL": CODE_URL,
-                      "HEADERS": CODE_HEADERS}
+                      "HEADERS": CODE_HEADERS,
+                      "PARAMS": CODE_PARAMS}
 
 BANK_INDICATOR_CONSTANT = {
     "URL": INDICATOR_URL,

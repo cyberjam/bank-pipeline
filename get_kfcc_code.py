@@ -6,7 +6,9 @@ from utils.write_json import write_json
 
 
 def build_params(region_name):
-    return {'r1': region_name, 'r2': ''}
+    params = BANK_CODE_CONSTANT['PARAMS']
+    params['r1'] = region_name
+    return params
 
 
 def extract_rows(soup):
