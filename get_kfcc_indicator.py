@@ -3,20 +3,23 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-from constants import INDICATOR_URL, INDICATOR_HEADERS, INDICATOR_PAYLOAD, CODE_JSON_PATH
+from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
 from utils.save_json import save_json
 
 
 def get_bank_code_info():
-    with open(CODE_JSON_PATH, encoding='UTF-8') as file:
+    with open(GLOBAL_CONSTANT['CODE_JSON_PATH'], encoding='UTF-8') as file:
         bank_infos = json.load(file)
         return {bank_info['gmgoCd']: bank_info['name'] for bank_info in bank_infos}
 
 
 def get_page_source(bank_code):
-    INDICATOR_PAYLOAD['gmgocd'] = bank_code
+    payload = BANK_INDICATOR_CONSTANT['PAYLOAD']
+    payload['gmgocd'] = bank_code
     response = requests.post(
-        INDICATOR_URL, headers=INDICATOR_HEADERS, data=INDICATOR_PAYLOAD)
+        BANK_INDICATOR_CONSTANT['URL'],
+        headers=BANK_INDICATOR_CONSTANT['HEADERS'],
+        data=payload)
     return response.text
 
 
@@ -74,7 +77,7 @@ def get_indicator():
 
 def main():
     bank_indicator = list(get_indicator())
-    save_json('data/bank_indicator.json', bank_indicator)
+    save_json(GLOBAL_CONSTANT['INDICATOR_JSON_PATH'], bank_indicator)
 
 
 if __name__ == '__main__':

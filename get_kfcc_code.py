@@ -2,17 +2,8 @@ from typing import Final, Dict
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-from constants import CODE_JSON_PATH
+from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
 from utils.save_json import save_json
-
-REGION: Final = ('서울', '인천', '경기', '강원', '충남', '충북', '대전', '경북',
-                 '경남', '대구', '부산', '울산', '전북', '전남', '광주', '제주', '세종')
-URL: Final = 'https://www.kfcc.co.kr/map/list.do'
-
-headers: Dict = {
-    'user-agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
-}
 
 
 def get_page_source(region_name):
@@ -25,7 +16,8 @@ def get_page_source(region_name):
         string: 해당 지역 지점 목록 html이 text로 반환
     """
     params = {'r1': region_name, 'r2': ''}
-    response = requests.get(URL, params=params, headers=headers)
+    response = requests.get(
+        BANK_CODE_CONSTANT['URL'], params=params, headers=BANK_CODE_CONSTANT['HEADERS'])
     return response.text
 
 
@@ -83,7 +75,7 @@ def get_bank_info():
     Yields:
         dictionary: 각 지점 정보
     """
-    for region_name in tqdm(REGION):
+    for region_name in tqdm(BANK_CODE_CONSTANT['REGION']):
         html = get_page_source(region_name)
         soup = get_soup(html)
         for row in get_rows(soup):
@@ -93,8 +85,8 @@ def get_bank_info():
 
 def main():
     """main 실행함수"""
-    bank_info = get_bank_info()
-    save_json(CODE_JSON_PATH, bank_info)
+    bank_info = list(get_bank_info())
+    save_json(GLOBAL_CONSTANT['CODE_JSON_PATH'], bank_info)
 
 
 if __name__ == '__main__':
