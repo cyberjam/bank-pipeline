@@ -5,7 +5,11 @@ from utils.save_json import save_json
 from utils.create_soup import create_soup
 
 
-def get_page_source(region_name):
+def get_params(region_name):
+    return {'r1': region_name, 'r2': ''}
+
+
+def get_page_source(params):
     """지역별 지점 목록을 나타내는 페이지 소스코드를 반환합니다.
 
     Args:
@@ -14,9 +18,11 @@ def get_page_source(region_name):
     Returns:
         string: 해당 지역 지점 목록 html이 text로 반환
     """
-    params = {'r1': region_name, 'r2': ''}
-    response = requests.get(
-        BANK_CODE_CONSTANT['URL'], params=params, headers=BANK_CODE_CONSTANT['HEADERS'])
+
+    response = requests.request('GET',
+                                BANK_CODE_CONSTANT['URL'],
+                                headers=BANK_CODE_CONSTANT['HEADERS'],
+                                params=params)
     return response.text
 
 
@@ -63,7 +69,8 @@ def get_bank_info():
         dictionary: 각 지점 정보
     """
     for region_name in tqdm(BANK_CODE_CONSTANT['REGION']):
-        html = get_page_source(region_name)
+        params = get_params(region_name)
+        html = get_page_source(params)
         soup = create_soup(html)
         for row in get_rows(soup):
             for cell in get_cells(row):

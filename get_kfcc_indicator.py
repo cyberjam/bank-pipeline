@@ -13,13 +13,17 @@ def get_bank_code_info():
         return {bank_info['gmgoCd']: bank_info['name'] for bank_info in bank_infos}
 
 
-def get_page_source(bank_code):
+def get_payload(bank_code):
     payload = BANK_INDICATOR_CONSTANT['PAYLOAD']
     payload['gmgocd'] = bank_code
-    response = requests.post(
-        BANK_INDICATOR_CONSTANT['URL'],
-        headers=BANK_INDICATOR_CONSTANT['HEADERS'],
-        data=payload)
+    return payload
+
+
+def get_page_source(payload):
+    response = requests.request('POST',
+                                BANK_INDICATOR_CONSTANT['URL'],
+                                headers=BANK_INDICATOR_CONSTANT['HEADERS'],
+                                data=payload)
     return response.text
 
 
@@ -64,7 +68,8 @@ def integrate_indicator(processed_raw_data, bank_code, bank_name):
 
 def get_indicator():
     for bank_code, bank_name in tqdm(get_bank_code_info().items()):
-        html = get_page_source(bank_code)
+        payload = get_payload(bank_code)
+        html = get_page_source(payload)
         soup = create_soup(html)
         raw_data = get_raw_data(soup)
         processed_raw_data = process_raw_data(raw_data)
