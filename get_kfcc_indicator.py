@@ -1,10 +1,10 @@
 import json
 import re
-import requests
 from tqdm import tqdm
 from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
 from utils.save_json import save_json
 from utils.create_soup import create_soup
+from utils.fetch_page_source import fetch_page_source
 
 
 def get_bank_code_info():
@@ -17,14 +17,6 @@ def get_payload(bank_code):
     payload = BANK_INDICATOR_CONSTANT['PAYLOAD']
     payload['gmgocd'] = bank_code
     return payload
-
-
-def get_page_source(payload):
-    response = requests.request('POST',
-                                BANK_INDICATOR_CONSTANT['URL'],
-                                headers=BANK_INDICATOR_CONSTANT['HEADERS'],
-                                data=payload)
-    return response.text
 
 
 def get_raw_data(soup):
@@ -69,7 +61,10 @@ def integrate_indicator(processed_raw_data, bank_code, bank_name):
 def get_indicator():
     for bank_code, bank_name in tqdm(get_bank_code_info().items()):
         payload = get_payload(bank_code)
-        html = get_page_source(payload)
+        html = fetch_page_source(method='POST',
+                                 url=BANK_INDICATOR_CONSTANT['URL'],
+                                 headers=BANK_INDICATOR_CONSTANT['HEADERS'],
+                                 data=payload)
         soup = create_soup(html)
         raw_data = get_raw_data(soup)
         processed_raw_data = process_raw_data(raw_data)
