@@ -1,7 +1,7 @@
 import requests
 
 
-def fetch_page_source(url='', method='', params=None, headers=None, data=None):
+def fetch_page_source(method='', url='', params=None, headers=None, data=None):
     """페이지 소스코드를 반환합니다.
     Args:
         url (string): _description_
