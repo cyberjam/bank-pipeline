@@ -1,9 +1,9 @@
 from typing import Final, Dict
 import requests
-from bs4 import BeautifulSoup
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
 from utils.save_json import save_json
+from utils.create_soup import create_soup
 
 
 def get_page_source(region_name):
@@ -19,18 +19,6 @@ def get_page_source(region_name):
     response = requests.get(
         BANK_CODE_CONSTANT['URL'], params=params, headers=BANK_CODE_CONSTANT['HEADERS'])
     return response.text
-
-
-def get_soup(html):
-    """html을 beautifulsoup로 parsing하여 객체로 반환합니다.
-
-    Args:
-        html (string): 전국 지점 목록 페이지를 request하여 받은 page source code
-
-    Returns:
-        bs4.BeautifulSoup: html을 beutifulsoup으로 parsing 한 soup 객체
-    """
-    return BeautifulSoup(html, 'html.parser')
 
 
 def get_rows(soup):
@@ -77,7 +65,7 @@ def get_bank_info():
     """
     for region_name in tqdm(BANK_CODE_CONSTANT['REGION']):
         html = get_page_source(region_name)
-        soup = get_soup(html)
+        soup = create_soup(html)
         for row in get_rows(soup):
             for cell in get_cells(row):
                 yield dict(get_datas(cell))
