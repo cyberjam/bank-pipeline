@@ -1,10 +1,11 @@
 import json
 import re
 from tqdm import tqdm
+import pandas as pd
+import gspread
 from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
 from utils.fetch_page_source import fetch_page_source
 from utils.create_soup import create_soup
-from utils.write_json import write_json
 
 
 def load_bank_code_info():
@@ -71,9 +72,17 @@ def fetch_bank_indicators():
         yield build_indicator_data(parsed_raw_data, bank_code, bank_name)
 
 
+def write_sheet(bank_indicator):
+    df = pd.DataFrame(bank_indicator)
+    gs = gspread.service_account('realjamdev_gcp_key.json')
+    sheet = gs.open("BANK_DB")
+    worksheet = sheet.worksheet("kfcc")
+    worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+
+
 def main():
     bank_indicator = list(fetch_bank_indicators())
-    write_json(GLOBAL_CONSTANT['INDICATOR_JSON_PATH'], bank_indicator)
+    write_sheet(bank_indicator)
 
 
 if __name__ == '__main__':
