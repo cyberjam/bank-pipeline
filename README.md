@@ -31,3 +31,7 @@ conda install -c conda-forge tqdm -y
 ```
 conda install -c anaconda pandas -y
 ```
+
+```
+conda install -c conda-forge gspread -y
+```
