@@ -1,6 +1,7 @@
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
-from utils import create_soup, fetch_page_source, write_json
+from utils import write_json
+from utils import scraper
 
 
 def build_params(region_name):
@@ -53,11 +54,11 @@ def fetch_bank_info():
     """
     for region_name in tqdm(BANK_CODE_CONSTANT['REGION']):
         params = build_params(region_name)
-        html = fetch_page_source(method='GET',
-                                 url=BANK_CODE_CONSTANT['URL'],
-                                 headers=BANK_CODE_CONSTANT['HEADERS'],
-                                 params=params)
-        soup = create_soup(html)
+        html = scraper.fetch_page_source(method='GET',
+                                         url=BANK_CODE_CONSTANT['URL'],
+                                         headers=BANK_CODE_CONSTANT['HEADERS'],
+                                         params=params)
+        soup = scraper.create_soup(html)
         for row in extract_rows(soup):
             for cell in extract_cells(row):
                 yield dict(extract_data(cell))
