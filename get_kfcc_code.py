@@ -1,6 +1,7 @@
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
-from utils import scraper, io
+from utils.scraper import Scraper
+from utils.io import save_json
 
 
 def build_params(region_name):
@@ -51,6 +52,7 @@ def fetch_bank_info():
     Yields:
         dictionary: 각 지점 정보
     """
+    scraper = Scraper()
     for region_name in tqdm(BANK_CODE_CONSTANT['REGION']):
         params = build_params(region_name)
         html = scraper.fetch_page_source(method='GET',
@@ -66,7 +68,7 @@ def fetch_bank_info():
 def main():
     """main 실행함수"""
     bank_info = list(fetch_bank_info())
-    io.save_json(GLOBAL_CONSTANT['CODE_JSON_PATH'], bank_info)
+    save_json(GLOBAL_CONSTANT['CODE_JSON_PATH'], bank_info)
 
 
 if __name__ == '__main__':
