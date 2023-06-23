@@ -1,6 +1,6 @@
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
-from utils import scraper, write_json
+from utils import scraper, io
 
 
 def build_params(region_name):
@@ -66,7 +66,7 @@ def fetch_bank_info():
 def main():
     """main 실행함수"""
     bank_info = list(fetch_bank_info())
-    write_json(GLOBAL_CONSTANT['CODE_JSON_PATH'], bank_info)
+    io.save_json(GLOBAL_CONSTANT['CODE_JSON_PATH'], bank_info)
 
 
 if __name__ == '__main__':
