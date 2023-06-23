@@ -4,8 +4,8 @@ from tqdm import tqdm
 import pandas as pd
 import gspread
 from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
-from utils.fetch_page_source import fetch_page_source
-from utils.create_soup import create_soup
+from utils import fetch_page_source, create_soup
+# from utils.create_soup import create_soup
 
 
 def load_bank_code_info():
