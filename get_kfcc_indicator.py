@@ -1,11 +1,12 @@
 import re
 from tqdm import tqdm
 from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
-from utils import scraper, io
+from utils.scraper import Scraper
+from utils.io import load_json, save_to_google_sheet
 
 
 def load_bank_code_info():
-    bank_infos = io.load_json(GLOBAL_CONSTANT['CODE_JSON_PATH'])
+    bank_infos = load_json(GLOBAL_CONSTANT['CODE_JSON_PATH'])
     return {bank_info['gmgoCd']: (bank_info['name'], bank_info['r1']) for bank_info in bank_infos}
 
 
@@ -73,6 +74,7 @@ def build_indicator_data(processed_raw_data, bank_code, bank_name, province):
 
 
 def fetch_bank_indicators():
+    scraper = Scraper()
     for bank_code, bank_info in tqdm(load_bank_code_info().items()):
         bank_name, province = bank_info
         payload = build_payload(bank_code)
@@ -88,7 +90,7 @@ def fetch_bank_indicators():
 
 def main():
     bank_indicator = list(fetch_bank_indicators())
-    io.save_to_google_sheet(bank_indicator)
+    save_to_google_sheet(bank_indicator)
 
 
 if __name__ == '__main__':
