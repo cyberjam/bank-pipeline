@@ -43,7 +43,7 @@ def parse_raw_data(raw_data):
 
 
 def extract_indicator(processed_raw_data, address):
-    return processed_raw_data.get(address, f'{" "*3}')[2]
+    return processed_raw_data.get(address, f'{"  0"}')[2]
 
 
 def build_indicator_data(processed_raw_data, bank_code, bank_name, province):
