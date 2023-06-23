@@ -4,8 +4,7 @@ from tqdm import tqdm
 import pandas as pd
 import gspread
 from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
-from utils.fetch_page_source import fetch_page_source
-from utils.create_soup import create_soup
+from utils import scraper
 
 
 def load_bank_code_info():
@@ -62,11 +61,11 @@ def build_indicator_data(processed_raw_data, bank_code, bank_name):
 def fetch_bank_indicators():
     for bank_code, bank_name in tqdm(load_bank_code_info().items()):
         payload = build_payload(bank_code)
-        html = fetch_page_source(method='POST',
-                                 url=BANK_INDICATOR_CONSTANT['URL'],
-                                 headers=BANK_INDICATOR_CONSTANT['HEADERS'],
-                                 data=payload)
-        soup = create_soup(html)
+        html = scraper.fetch_page_source(method='POST',
+                                         url=BANK_INDICATOR_CONSTANT['URL'],
+                                         headers=BANK_INDICATOR_CONSTANT['HEADERS'],
+                                         data=payload)
+        soup = scraper.create_soup(html)
         raw_data = extract_raw_data(soup)
         parsed_raw_data = parse_raw_data(raw_data)
         yield build_indicator_data(parsed_raw_data, bank_code, bank_name)

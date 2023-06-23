@@ -1,6 +1,8 @@
-# # Hello! This is bank-pipeline
+# Hello! This is bank-pipeline
 
-새마을금고 건전성 지표를 주기적으로 저장하자
+새마을금고 건전성 지표를 주기적으로 저장하자!
+
+Let's save hidden index of financial soundness periodically!
 
 # Installation
 
