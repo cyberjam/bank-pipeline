@@ -1,7 +1,6 @@
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
-from utils.fetch_page_source import fetch_page_source
-from utils import create_soup, write_json
+from utils import create_soup, fetch_page_source, write_json
 
 
 def build_params(region_name):

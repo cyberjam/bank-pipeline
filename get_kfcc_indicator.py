@@ -5,7 +5,6 @@ import pandas as pd
 import gspread
 from constants import BANK_INDICATOR_CONSTANT, GLOBAL_CONSTANT
 from utils import fetch_page_source, create_soup
-# from utils.create_soup import create_soup
 
 
 def load_bank_code_info():
