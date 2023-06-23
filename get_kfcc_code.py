@@ -1,7 +1,6 @@
 from tqdm import tqdm
 from constants import BANK_CODE_CONSTANT, GLOBAL_CONSTANT
-from utils import write_json
-from utils import scraper
+from utils import scraper, write_json
 
 
 def build_params(region_name):
