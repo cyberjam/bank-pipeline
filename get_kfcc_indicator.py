@@ -75,7 +75,8 @@ def build_indicator_data(processed_raw_data, bank_code, bank_name, province):
 
 def fetch_bank_indicators():
     scraper = Scraper()
-    for bank_code, bank_info in tqdm(load_bank_code_info().items()):
+    bank_code_info = load_bank_code_info()
+    for bank_code, bank_info in tqdm(bank_code_info.items()):
         bank_name, province = bank_info
         payload = build_payload(bank_code)
         html = scraper.fetch_page_source(method='POST',
