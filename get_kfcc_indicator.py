@@ -67,6 +67,7 @@ def build_indicator_data(processed_raw_data, bank_code, bank_name, province):
         "지점코드": bank_code,
         "위험가중자산대비 자기자본비율": extract_indicator(processed_raw_data, '25000001'),
         "순고정이하 여신비율": extract_indicator(processed_raw_data, '25000005'),
+        "연체대출금비율": extract_indicator(processed_raw_data, '25000006'),
         "유동성 비율": extract_indicator(processed_raw_data, '25000007'),
         "총자산 순이익률": extract_indicator(processed_raw_data, '25000009'),
         "경영실태 평가": parse_grade(extract_grade_indicator(processed_raw_data, '31000001')),
